@@ -1,5 +1,7 @@
 package com.rubenskj.engine.shaders;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
@@ -13,6 +15,8 @@ public abstract class ShaderProgram {
     private int vertexShaderId;
     private int fragmentShaderId;
 
+    private float[] MATRIX_BUFFER = new float[16];
+
     protected ShaderProgram(String vertexFile, String fragmentFile) {
         vertexShaderId = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
         fragmentShaderId = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
@@ -22,6 +26,13 @@ public abstract class ShaderProgram {
         bindAttributes();
         GL20.glLinkProgram(programId);
         GL20.glValidateProgram(programId);
+        getAllUniformLocations();
+    }
+
+    protected abstract void getAllUniformLocations();
+
+    protected int getUniformLocation(String uniformName) {
+        return GL20.glGetUniformLocation(programId, uniformName);
     }
 
     public void start() {
@@ -45,6 +56,29 @@ public abstract class ShaderProgram {
 
     protected void bindAttribute(int attribute, String variableName) {
         GL20.glBindAttribLocation(programId, attribute, variableName);
+    }
+
+    protected void loadFloat(int location, float value) {
+        GL20.glUniform1f(location, value);
+    }
+
+    protected void loadVector(int location, Vector3f vector) {
+        GL20.glUniform3f(location, vector.x, vector.y, vector.z);
+    }
+
+    protected void loadBoolean(int location, boolean value) {
+        float toLoad = 0;
+        if (value) {
+            toLoad = 1;
+        }
+
+        GL20.glUniform1f(location, toLoad);
+    }
+
+    protected void loadMatrix(int location, Matrix4f matrix) {
+        matrix.get(MATRIX_BUFFER);
+
+        GL20.glUniformMatrix4fv(location, false, MATRIX_BUFFER);
     }
 
     private static int loadShader(String file, int type) {
