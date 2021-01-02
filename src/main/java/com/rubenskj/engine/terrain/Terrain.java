@@ -2,7 +2,8 @@ package com.rubenskj.engine.terrain;
 
 import com.rubenskj.engine.model.RawModel;
 import com.rubenskj.engine.render.Loader;
-import com.rubenskj.engine.textures.ModelTexture;
+import com.rubenskj.engine.textures.TerrainTexture;
+import com.rubenskj.engine.textures.TerrainTexturePack;
 
 public class Terrain {
 
@@ -12,13 +13,15 @@ public class Terrain {
     private float x;
     private float z;
     private RawModel model;
-    private ModelTexture texture;
+    private TerrainTexturePack texturePack;
+    private TerrainTexture blendMap;
 
-    public Terrain(float gridX, float gridZ, Loader loader, ModelTexture texture) {
+    public Terrain(float gridX, float gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap) {
         this.x = gridX * SIZE;
         this.z = gridZ * SIZE;
         this.model = generateTerrain(loader);
-        this.texture = texture;
+        this.texturePack = texturePack;
+        this.blendMap = blendMap;
     }
 
     public float getX() {
@@ -33,8 +36,12 @@ public class Terrain {
         return model;
     }
 
-    public ModelTexture getTexture() {
-        return texture;
+    public TerrainTexturePack getTexturePack() {
+        return texturePack;
+    }
+
+    public TerrainTexture getBlendMap() {
+        return blendMap;
     }
 
     private RawModel generateTerrain(Loader loader) {

@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 public class Camera {
 
-    private Vector3f position = new Vector3f(0, 0, 0);
+    private Vector3f position = new Vector3f(100, 35, 50);
     private float pitch;
     private float yaw;
     private float roll;
@@ -19,23 +19,7 @@ public class Camera {
     public void move() {
         long window = WindowManager.getInstance();
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GL_TRUE) {
-            position.z -= 0.2f;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_D) == GL_TRUE) {
-            position.x += 0.2f;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GL_TRUE) {
-            position.x -= 0.2f;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_S) == GL_TRUE) {
-            position.z += 0.2f;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GL_TRUE) {
+        if (glfwGetKey(window, GLFW_KEY_KP_5) == GL_TRUE) {
             position.y += 0.2f;
         }
 

@@ -4,6 +4,7 @@ import com.rubenskj.engine.entities.Camera;
 import com.rubenskj.engine.entities.Light;
 import com.rubenskj.engine.toolbox.Maths;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import static com.rubenskj.engine.util.StaticUtil.TERRAIN_FRAGMENT_FILE;
 import static com.rubenskj.engine.util.StaticUtil.TERRAIN_VERTEX_FILE;
@@ -17,6 +18,12 @@ public class TerrainShader extends ShaderProgram {
     private int locationLightColour;
     private int locationShineDamper;
     private int locationReflectivity;
+    private int locationSkyColour;
+    private int locationBackgroundTexture;
+    private int locationrTexture;
+    private int locationgTexture;
+    private int locationbTexture;
+    private int locationBlendMap;
 
     public TerrainShader() {
         super(TERRAIN_VERTEX_FILE, TERRAIN_FRAGMENT_FILE);
@@ -38,6 +45,24 @@ public class TerrainShader extends ShaderProgram {
         locationLightColour = super.getUniformLocation("lightColour");
         locationShineDamper = super.getUniformLocation("shineDamper");
         locationReflectivity = super.getUniformLocation("reflectivity");
+        locationSkyColour = super.getUniformLocation("skyColour");
+        locationBackgroundTexture = super.getUniformLocation("backgroundTexture");
+        locationrTexture = super.getUniformLocation("rTexture");
+        locationgTexture = super.getUniformLocation("gTexture");
+        locationbTexture = super.getUniformLocation("bTexture");
+        locationBlendMap = super.getUniformLocation("blendMap");
+    }
+
+    public void connectTextureUnits() {
+        super.loadInt(locationBackgroundTexture, 0);
+        super.loadInt(locationrTexture, 1);
+        super.loadInt(locationgTexture, 2);
+        super.loadInt(locationbTexture, 3);
+        super.loadInt(locationBlendMap, 4);
+    }
+
+    public void loadSkyColour(float r, float g, float b) {
+        super.loadVector(locationSkyColour, new Vector3f(r, g, b));
     }
 
     public void loadShineVariables(float damper, float reflectivity) {

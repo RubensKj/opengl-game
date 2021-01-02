@@ -1,8 +1,6 @@
 package com.rubenskj.engine;
 
-import com.rubenskj.engine.entities.Camera;
-import com.rubenskj.engine.entities.Entity;
-import com.rubenskj.engine.entities.Light;
+import com.rubenskj.engine.entities.*;
 import com.rubenskj.engine.io.OBJLoader;
 import com.rubenskj.engine.model.RawModel;
 import com.rubenskj.engine.model.TexturedModel;
@@ -10,6 +8,8 @@ import com.rubenskj.engine.render.Loader;
 import com.rubenskj.engine.render.MasterRenderer;
 import com.rubenskj.engine.terrain.Terrain;
 import com.rubenskj.engine.textures.ModelTexture;
+import com.rubenskj.engine.textures.TerrainTexture;
+import com.rubenskj.engine.textures.TerrainTexturePack;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -26,35 +26,64 @@ public class EngineApplication {
 
         Loader loader = new Loader();
 
-        Entity stall = createStall(loader);
-        List<Entity> trees = createTrees(loader);
-        List<Entity> grasses = createGrass(loader);
+        // TERRAIN PACK
 
-        Light light = new Light(new Vector3f(3000, 2000, 1000), new Vector3f(1, 1, 1));
+        TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy2"));
+        TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("mud"));
+        TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("grassFlowers"));
+        TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
 
-        ModelTexture texture = new ModelTexture(loader.loadTexture("grass_terrain"));
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
 
-        texture.setShineDamper(100);
-        texture.setReflectivity(10);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
 
-        Terrain terrain = new Terrain(0, 0, loader, texture);
-        Terrain terrain2 = new Terrain(-1, -1, loader, texture);
-        Terrain terrain3 = new Terrain(0, -1, loader, texture);
-        Terrain terrain4 = new Terrain(-1, 0, loader, texture);
+        // ENTITIES
+
+        Entity tree = createEntity("tree", "tree", new Vector3f(0, 0, 0), 1, loader);
+        Entity grass = createEntity("grassModel", "grassTexture", new Vector3f(0, 0, 0), 1, loader);
+        Entity flower = createEntity("grassModel", "flower", new Vector3f(0, 0, 0), 1, loader);
+        Entity fern = createEntity("fern", "fern", new Vector3f(0, 0, 0), 1, loader);
+
+        grass.getModel().getTexture().setHasTransparency(true);
+        grass.getModel().getTexture().setUseFakeLighting(true);
+        flower.getModel().getTexture().setHasTransparency(true);
+        flower.getModel().getTexture().setUseFakeLighting(true);
+        fern.getModel().getTexture().setHasTransparency(true);
+
+        List<Entity> entities = new ArrayList<>();
+
+        Random random = new Random(676452);
+
+        entities.addAll(createGrass(loader));
+        entities.addAll(createTrees(loader));
+
+        // LIGHT
+
+        Light light = new Light(new Vector3f(20000, 40000, 20000), new Vector3f(1, 1, 1));
+
+        // TERRAIN
+
+        Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
+        Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
+
+        // CAMERA AND RENDER
 
         Camera camera = new Camera();
         MasterRenderer renderer = new MasterRenderer();
 
+
+        TexturedModel texturedPlayer = createTexturedModel("person", "playerTexture", loader);
+
+        Player player = new Player(texturedPlayer, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+
         while (!glfwWindowShouldClose(window)) {
             camera.move();
+            player.move();
 
+            renderer.processEntity(player);
             renderer.processTerrain(terrain);
             renderer.processTerrain(terrain2);
-            renderer.processTerrain(terrain3);
-            renderer.processTerrain(terrain4);
-            renderer.processEntity(stall);
-            trees.forEach(renderer::processEntity);
-            grasses.forEach(renderer::processEntity);
+            entities.forEach(renderer::processEntity);
 
             renderer.render(light, camera);
 
@@ -66,8 +95,25 @@ public class EngineApplication {
         closeWindow();
     }
 
+    private static Entity createEntity(String fileObjName, String fileTextureName, Vector3f position, float scale, Loader loader) {
+        ModelData data = OBJLoader.loadOBJ(fileObjName);
+        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        ModelTexture texture = new ModelTexture(loader.loadTexture(fileTextureName));
+        TexturedModel texturedModel = new TexturedModel(model, texture);
+
+        return new Entity(texturedModel, position, 0, 0, 0, scale);
+    }
+
+    private static TexturedModel createTexturedModel(String fileObjName, String fileTextureName, Loader loader) {
+        ModelData data = OBJLoader.loadOBJ(fileObjName);
+        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        ModelTexture texture = new ModelTexture(loader.loadTexture(fileTextureName));
+        return new TexturedModel(model, texture);
+    }
+
     private static Entity createStall(Loader loader) {
-        RawModel model = OBJLoader.loadObjModel("stall", loader);
+        ModelData data = OBJLoader.loadOBJ("stall");
+        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
         ModelTexture texture = new ModelTexture(loader.loadTexture("stallTexture"));
         TexturedModel texturedModel = new TexturedModel(model, texture);
 
@@ -78,7 +124,8 @@ public class EngineApplication {
     }
 
     private static List<Entity> createTrees(Loader loader) {
-        RawModel model = OBJLoader.loadObjModel("tree", loader);
+        ModelData data = OBJLoader.loadOBJ("tree");
+        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
         ModelTexture texture = new ModelTexture(loader.loadTexture("tree"));
         TexturedModel texturedModel = new TexturedModel(model, texture);
 
@@ -98,21 +145,19 @@ public class EngineApplication {
     }
 
     private static List<Entity> createGrass(Loader loader) {
-        RawModel model = OBJLoader.loadObjModel("grassModel", loader);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("grassTexture"));
 
-        RawModel modelFern = OBJLoader.loadObjModel("fern", loader);
-        ModelTexture textureFern = new ModelTexture(loader.loadTexture("fern"));
+        Entity grass = createEntity("grassModel", "grassTexture", new Vector3f(0, 0, 0), 0.4f, loader);
+        Entity fern = createEntity("fern", "fern", new Vector3f(0, 0, 0), 0.6f, loader);
+        Entity flower = createEntity("grassModel", "flower", new Vector3f(0, 0, 0), 0.4f, loader);
 
-        TexturedModel texturedModel = new TexturedModel(model, texture);
-        TexturedModel texturedModelFern = new TexturedModel(modelFern, textureFern);
+        grass.getModel().getTexture().setHasTransparency(true);
+        grass.getModel().getTexture().setUseFakeLighting(true);
+        fern.getModel().getTexture().setHasTransparency(true);
+        fern.getModel().getTexture().setUseFakeLighting(true);
+        flower.getModel().getTexture().setHasTransparency(true);
+        flower.getModel().getTexture().setUseFakeLighting(true);
 
-        texture.setHasTransparency(true);
-        texture.setUseFakeLighting(true);
-        textureFern.setHasTransparency(true);
-        textureFern.setUseFakeLighting(true);
-
-        List<Entity> grass = new ArrayList<>();
+        List<Entity> grasses = new ArrayList<>();
 
         for (int i = 0; i < 200; i++) {
             Random random = new Random();
@@ -122,13 +167,21 @@ public class EngineApplication {
             float z = random.nextFloat() * 105 - 50;
 
             if (i > 88) {
-                grass.add(new Entity(texturedModelFern, new Vector3f(x, y, z), 0, 0, 0, 0.6f));
+                fern.setPosition(new Vector3f(x, y, z));
+                grasses.add(fern);
                 continue;
             }
 
-            grass.add(new Entity(texturedModel, new Vector3f(x, y, z), 0, 0, 0, 1));
+            if (i > 150) {
+                flower.setPosition(new Vector3f(x, y, z));
+                grasses.add(flower);
+                continue;
+            }
+
+            grass.setPosition(new Vector3f(x, y, z));
+            grasses.add(grass);
         }
 
-        return grass;
+        return grasses;
     }
 }

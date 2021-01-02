@@ -14,6 +14,9 @@ public class WindowManager {
 
     private static final int FPS_CAP = 120;
 
+    private static long lastFrameTime;
+    private static float delta;
+
     public static long getInstance() {
         if (WINDOW == 0) {
             createWindow();
@@ -30,6 +33,7 @@ public class WindowManager {
         setWindowHints();
 
         build("Our First Window", WIDHT, HEIGHT, 0, 0);
+        lastFrameTime = getCurrentTime();
     }
 
     private static void setWindowHints() {
@@ -75,11 +79,24 @@ public class WindowManager {
         glfwPollEvents();
 
         glfwSwapBuffers(getInstance());
+
+        long currentTime = getCurrentTime();
+
+        delta = (currentTime - lastFrameTime) / 1000f;
+        lastFrameTime = getCurrentTime();
+    }
+
+    public static float getFrameTimeSeconds() {
+        return delta;
     }
 
     public static void closeWindow() {
         glfwDestroyWindow(getInstance());
 
         glfwTerminate();
+    }
+
+    private static long getCurrentTime() {
+        return System.currentTimeMillis();
     }
 }
