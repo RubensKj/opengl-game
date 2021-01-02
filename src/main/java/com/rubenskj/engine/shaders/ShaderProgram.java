@@ -13,15 +13,15 @@ public abstract class ShaderProgram {
     private int vertexShaderId;
     private int fragmentShaderId;
 
-    public ShaderProgram(String vertexFile, String fragmentFile) {
+    protected ShaderProgram(String vertexFile, String fragmentFile) {
         vertexShaderId = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
         fragmentShaderId = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
         programId = GL20.glCreateProgram();
         GL20.glAttachShader(programId, vertexShaderId);
         GL20.glAttachShader(programId, fragmentShaderId);
+        bindAttributes();
         GL20.glLinkProgram(programId);
         GL20.glValidateProgram(programId);
-        bindAttributes();
     }
 
     public void start() {
