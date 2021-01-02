@@ -14,6 +14,7 @@
         <java.version>11</java.version>
         <lwjgl.version>3.2.3</lwjgl.version>
         <steamworks4j.version>1.8.0</steamworks4j.version>
+        <joml.version>1.10.0</joml.version>
     </properties>
 
     <profiles>
@@ -443,14 +444,20 @@
         <dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
-            <version>1.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slick2d</groupId>
-            <artifactId>slick2d-core</artifactId>
-            <version>1.0.2</version>
+            <version>${joml.version}</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>Clojars Repository</id>
+            <url>https://clojars.org/repo/</url>
+        </repository>
+        <repository>
+            <id>BeaTunes Repository</id>
+            <url>https://www.beatunes.com/repo/maven2/</url>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>${project.artifactId}</finalName>

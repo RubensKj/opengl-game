@@ -1,46 +1,61 @@
 package com.rubenskj.engine.render;
 
+import com.rubenskj.engine.util.FileUtil;
 import com.rubenskj.engine.model.RawModel;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 
 public class Loader {
+
+    private static final Logger LOGGER = Logger.getLogger(Loader.class.getName());
 
     private List<Integer> vaos = new ArrayList<>();
     private List<Integer> vbos = new ArrayList<>();
     private List<Integer> textures = new ArrayList<>();
 
-    public RawModel loadToVAO(float[] positions, int[] indices) {
+    public RawModel loadToVAO(float[] positions, float[] texturesCoords, int[] indices) {
         int vaoId = createVAO();
 
         bindIndicesBuffer(indices);
-        storeDataInAttributeList(0, positions);
+        storeDataInAttributeList(0, 3, positions);
+        storeDataInAttributeList(1, 2, texturesCoords);
         unbindVAO();
 
         return new RawModel(vaoId, indices.length);
     }
 
     public int loadTexture(String fileName) {
-        Texture texture = null;
-        try {
-            texture = TextureLoader.getTexture("PNG", new FileInputStream("res/" + fileName + ".png"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        int[] x = new int[1];
+        int[] y = new int[1];
+        int[] component = new int[1];
+
+        ByteBuffer pixels = stbi_load_from_memory(FileUtil.loadResource(fileName), x, y, component, 4);
+
+        if (pixels == null) {
+            LOGGER.info("Failed to load texture: " + fileName);
+            return 0;
         }
 
-        int textureId = texture.getTextureID();
+        int textureId = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, textureId);
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x[0], y[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
         textures.add(textureId);
 
@@ -63,7 +78,7 @@ public class Loader {
         return vaoId;
     }
 
-    private void storeDataInAttributeList(int attributeNumber, float[] data) {
+    private void storeDataInAttributeList(int attributeNumber, int coordinateSize, float[] data) {
         int vboId = GL15.glGenBuffers();
 
         vbos.add(vboId);
@@ -71,7 +86,7 @@ public class Loader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
         FloatBuffer buffer = storeDataInFloatBuffer(data);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-        GL20.glVertexAttribPointer(attributeNumber, 3, GL11.GL_FLOAT, false, 0, 0);
+        GL20.glVertexAttribPointer(attributeNumber, coordinateSize, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 

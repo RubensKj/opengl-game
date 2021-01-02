@@ -1,9 +1,11 @@
 package com.rubenskj.engine;
 
-import com.rubenskj.engine.render.Loader;
 import com.rubenskj.engine.model.RawModel;
+import com.rubenskj.engine.model.TexturedModel;
+import com.rubenskj.engine.render.Loader;
 import com.rubenskj.engine.render.Renderer;
 import com.rubenskj.engine.shaders.StaticShader;
+import com.rubenskj.engine.textures.ModelTexture;
 
 import static com.rubenskj.engine.io.WindowManager.*;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -29,13 +31,22 @@ public class EngineApplication {
                 3, 1, 2//bottom right triangle (v3, v1, v2)
         };
 
-        RawModel rawModel = loader.loadToVAO(vertices, indices);
+        float[] textureCoords = {
+                0, 0, // V0
+                0, 1, // V1
+                1, 1, // V2
+                1, 0  // V3
+        };
+
+        RawModel model = loader.loadToVAO(vertices, textureCoords, indices);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("simple_texture"));
+        TexturedModel texturedModel = new TexturedModel(model, texture);
 
         while (!glfwWindowShouldClose(window)) {
             renderer.prepare();
 
             shader.start();
-            renderer.render(rawModel);
+            renderer.render(texturedModel);
             shader.stop();
 
             updateWindow();

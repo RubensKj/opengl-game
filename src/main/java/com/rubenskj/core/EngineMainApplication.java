@@ -27,7 +27,7 @@ public class EngineMainApplication {
         shader.create("basic");
 
         Texture texture = new Texture();
-        texture.create("/textures/checker.png");
+        texture.create("/res/checker.png");
 
         Camera camera = new Camera();
         Transform transform = new Transform();
