@@ -20,19 +20,19 @@ public class Camera {
         long window = WindowManager.getInstance();
 
         if (glfwGetKey(window, GLFW_KEY_W) == GL_TRUE) {
-            position.z -= 0.02f;
+            position.z -= 0.2f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GL_TRUE) {
-            position.x += 0.02f;
+            position.x += 0.2f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GL_TRUE) {
-            position.x -= 0.02f;
+            position.x -= 0.2f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GL_TRUE) {
-            position.z += 0.02f;
+            position.z += 0.2f;
         }
     }
 

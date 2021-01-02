@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static com.rubenskj.engine.util.StaticUtil.RESOURCES_TEXTURE_PLACE;
+import static com.rubenskj.engine.util.StaticUtil.RES_FOLDER;
 import static com.rubenskj.engine.util.StaticUtil.TEXTURE_ERROR_IMAGE;
 
 public class FileUtil {
@@ -19,7 +19,7 @@ public class FileUtil {
     }
 
     private static ByteBuffer loadResourceFromFile(String file) {
-        try (FileInputStream fileInputStream = new FileInputStream(RESOURCES_TEXTURE_PLACE + file + ".png")) {
+        try (FileInputStream fileInputStream = new FileInputStream(RES_FOLDER + file + ".png")) {
             return createByteBufferFromFileInputStream(fileInputStream);
         } catch (IOException e) {
             try (FileInputStream fileInputStream = new FileInputStream(TEXTURE_ERROR_IMAGE)) {

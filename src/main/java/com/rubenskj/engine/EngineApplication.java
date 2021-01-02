@@ -2,11 +2,12 @@ package com.rubenskj.engine;
 
 import com.rubenskj.engine.entities.Camera;
 import com.rubenskj.engine.entities.Entity;
+import com.rubenskj.engine.entities.Light;
+import com.rubenskj.engine.io.OBJLoader;
 import com.rubenskj.engine.model.RawModel;
 import com.rubenskj.engine.model.TexturedModel;
 import com.rubenskj.engine.render.Loader;
-import com.rubenskj.engine.render.Renderer;
-import com.rubenskj.engine.shaders.StaticShader;
+import com.rubenskj.engine.render.MasterRenderer;
 import com.rubenskj.engine.textures.ModelTexture;
 import org.joml.Vector3f;
 
@@ -19,110 +20,32 @@ public class EngineApplication {
         long window = getInstance();
 
         Loader loader = new Loader();
-        StaticShader shader = new StaticShader();
-        Renderer renderer = new Renderer(shader);
 
-        float[] vertices = {
-                -0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, -0.5f, 0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-
-                0.5f, 0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, 0.5f,
-                0.5f, 0.5f, 0.5f,
-
-                -0.5f, 0.5f, -0.5f,
-                -0.5f, -0.5f, -0.5f,
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, 0.5f, 0.5f,
-
-                -0.5f, 0.5f, 0.5f,
-                -0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, -0.5f,
-                0.5f, 0.5f, 0.5f,
-
-                -0.5f, -0.5f, 0.5f,
-                -0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, -0.5f,
-                0.5f, -0.5f, 0.5f
-
-        };
-
-        float[] textureCoords = {
-
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0,
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0
-
-
-        };
-
-        int[] indices = {
-                0, 1, 3,
-                3, 1, 2,
-                4, 5, 7,
-                7, 5, 6,
-                8, 9, 11,
-                11, 9, 10,
-                12, 13, 15,
-                15, 13, 14,
-                16, 17, 19,
-                19, 17, 18,
-                20, 21, 23,
-                23, 21, 22
-
-        };
-
-        RawModel model = loader.loadToVAO(vertices, textureCoords, indices);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("simple_texture"));
+        RawModel model = OBJLoader.loadObjModel("stall", loader);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("stallTexture"));
         TexturedModel texturedModel = new TexturedModel(model, texture);
 
-        Entity entity = new Entity(texturedModel, new Vector3f(0, 0, -5), 0, 0, 0, 1);
+//        texture.setShineDamper(10);
+//        texture.setReflectivity(1);
+
+        Entity entity = new Entity(texturedModel, new Vector3f(0, -2, -25), 0, 160, 0, 1);
+        Light light = new Light(new Vector3f(3000, 2000, 2000), new Vector3f(1, 1, 1));
 
         Camera camera = new Camera();
 
-        while (!glfwWindowShouldClose(window)) {
-            entity.increaseRotation(1, 1, 0);
-            camera.move();
-            renderer.prepare();
+        MasterRenderer renderer = new MasterRenderer();
 
-            shader.start();
-            shader.loadViewMatrix(camera);
-            renderer.render(entity, shader);
-            shader.stop();
+        while (!glfwWindowShouldClose(window)) {
+            camera.move();
+
+            renderer.processEntity(entity);
+
+            renderer.render(light, camera);
 
             updateWindow();
         }
 
-        shader.cleanUp();
+        renderer.cleanUp();
         loader.cleanUp();
         closeWindow();
     }

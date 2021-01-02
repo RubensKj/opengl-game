@@ -1,7 +1,7 @@
 package com.rubenskj.engine.render;
 
-import com.rubenskj.engine.util.FileUtil;
 import com.rubenskj.engine.model.RawModel;
+import com.rubenskj.engine.util.FileUtil;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -26,12 +26,13 @@ public class Loader {
     private List<Integer> vbos = new ArrayList<>();
     private List<Integer> textures = new ArrayList<>();
 
-    public RawModel loadToVAO(float[] positions, float[] texturesCoords, int[] indices) {
+    public RawModel loadToVAO(float[] positions, float[] texturesCoords, float[] normals, int[] indices) {
         int vaoId = createVAO();
 
         bindIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, positions);
         storeDataInAttributeList(1, 2, texturesCoords);
+        storeDataInAttributeList(2, 3, normals);
         unbindVAO();
 
         return new RawModel(vaoId, indices.length);

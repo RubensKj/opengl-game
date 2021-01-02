@@ -19,7 +19,7 @@ public class StaticUtil {
     public static final String FRAGMENT_FILE = getBasicPath() + "shaders/FragmentShader.glsl";
 
     // Folders
-    public static final String RESOURCES_TEXTURE_PLACE = getBasicPath() + "res/";
+    public static final String RES_FOLDER = getBasicPath() + "res/";
 
     private StaticUtil() {
     }
