@@ -1,11 +1,16 @@
-package com.rubenskj.engine.model;
+package com.rubenskj.engine.render;
 
+import com.rubenskj.engine.model.RawModel;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -15,6 +20,7 @@ public class Loader {
 
     private List<Integer> vaos = new ArrayList<>();
     private List<Integer> vbos = new ArrayList<>();
+    private List<Integer> textures = new ArrayList<>();
 
     public RawModel loadToVAO(float[] positions, int[] indices) {
         int vaoId = createVAO();
@@ -26,9 +32,25 @@ public class Loader {
         return new RawModel(vaoId, indices.length);
     }
 
+    public int loadTexture(String fileName) {
+        Texture texture = null;
+        try {
+            texture = TextureLoader.getTexture("PNG", new FileInputStream("res/" + fileName + ".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int textureId = texture.getTextureID();
+
+        textures.add(textureId);
+
+        return textureId;
+    }
+
     public void cleanUp() {
         vaos.forEach(GL30::glDeleteVertexArrays);
         vbos.forEach(GL15::glDeleteBuffers);
+        textures.forEach(GL11::glDeleteTextures);
     }
 
     private int createVAO() {
