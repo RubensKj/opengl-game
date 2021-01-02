@@ -18,6 +18,10 @@ public class StaticUtil {
     public static final String VERTEX_FILE = getBasicPath() + "shaders/VertexShader.glsl";
     public static final String FRAGMENT_FILE = getBasicPath() + "shaders/FragmentShader.glsl";
 
+    // Terrain
+    public static final String TERRAIN_VERTEX_FILE = getBasicPath() + "shaders/terrain/TerrainVertexShader.glsl";
+    public static final String TERRAIN_FRAGMENT_FILE = getBasicPath() + "shaders/terrain/TerrainFragmentShader.glsl";
+
     // Folders
     public static final String RES_FOLDER = getBasicPath() + "res/";
 

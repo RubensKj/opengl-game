@@ -34,6 +34,30 @@ public class Camera {
         if (glfwGetKey(window, GLFW_KEY_S) == GL_TRUE) {
             position.z += 0.2f;
         }
+
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GL_TRUE) {
+            position.y += 0.2f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GL_TRUE) {
+            position.y -= 0.2f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_KP_2) == GL_TRUE) {
+            pitch += 0.4f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_KP_8) == GL_TRUE) {
+            pitch -= 0.4f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_KP_6) == GL_TRUE) {
+            yaw += 0.7f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_KP_4) == GL_TRUE) {
+            yaw -= 0.7f;
+        }
     }
 
     public Vector3f getPosition() {
