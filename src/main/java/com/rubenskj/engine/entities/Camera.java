@@ -108,7 +108,6 @@ public class Camera {
             float pitchChange = Mouse.getDeltaY() * 0.1f;
 
             alterPitch(pitchChange);
-            System.out.println("PITCH: " + pitch);
 
             float angleChange = Mouse.getDeltaX() * 0.1f;
 
