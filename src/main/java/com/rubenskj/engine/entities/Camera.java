@@ -5,6 +5,9 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
+import static com.rubenskj.engine.entities.Mouse.updateDeltaValues;
+import static org.lwjgl.glfw.GLFW.*;
+
 public class Camera {
 
     private boolean mouseLocked = false;
@@ -23,7 +26,7 @@ public class Camera {
     }
 
     public void move() {
-
+        updateDeltaValues();
         // 19th Episode WATCH
         calculateZoom();
         calculatePitch();
@@ -93,85 +96,42 @@ public class Camera {
 
         // 19th Episode WATCH
 
-//        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-//            System.out.println("MOUSE DY:" + mouseDY);
-//            System.out.println("MOUSE Y:" + mouseY);
-//
-//            float pitchChange = mouseDY * 0.1f;
-//            pitch += pitchChange;
-//        }
-//        double newX = 400;
-//        double newY = 300;
-//
-//        double prevX = 0;
-//        double prevY = 0;
-//
-//        boolean rotX = false;
-//        boolean rotY = false;
-//
-//        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-//            glfwSetCursorPos(window, 800 / 2, 600 / 2);
-//
-//            mouseLocked = true;
-//        } else {
-//            mouseLocked = false;
-//        }
-//
-//        if (mouseLocked) {
-//            DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
-//            DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
-//
-//            glfwGetCursorPos(window, x, y);
-//            x.rewind();
-//            y.rewind();
-//
-//            newX = x.get();
-//            newY = y.get();
-//
-//            double deltaX = newX - 400;
-//            double deltaY = newY - 300;
-//
-//            rotX = newX != prevX;
-//            rotY = newY != prevY;
-//
-//            if (rotY) {
-//                System.out.println("ROTATE Y AXIS: " + deltaY);
-//
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
+            glfwSetCursorPos(window, Mouse.getActualPositionX(), Mouse.getActualPositionY());
+
+            mouseLocked = true;
+        } else {
+            mouseLocked = false;
+        }
+
+        if (mouseLocked) {
+//            if (Mouse.getDeltaY() <= 0 || Mouse.getDeltaY() >= 90) {
+//                return;
 //            }
-//            if (rotX) {
-//                System.out.println("ROTATE X AXIS: " + deltaX);
-//            }
-//
-//            System.out.println("Delta X = " + deltaX + " Delta Y = " + deltaY);
-//
-//            glfwSetCursorPos(window, 800 / 2, 600 / 2);
-//
-//            float pitchChange = (float) (deltaY * 0.1f);
-//            pitch -= pitchChange;
-//        }
+
+            float pitchChange = Mouse.getDeltaY() * 0.1f;
+            pitch -= pitchChange;
+        }
     }
 
     private void calculateAngleAroundPlayer() {
-
         // 19th Episode WATCH
-//        long window = WindowManager.getInstance();
-//
-//        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
-//            DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
-//            DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
-//
-//            glfwGetCursorPos(window, x, y);
-//            x.rewind();
-//
-//            double newX = x.get();
-//
-//            GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-//
-//            double deltaX = newX - videoMode.width() / 2;
-//
-//            float angleChange = (float) (deltaX * 0.3f);
-//
-//            angleAroundPlayer -= angleChange;
-//        }
+        long window = WindowManager.getInstance();
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
+            glfwSetCursorPos(window, Mouse.getActualPositionX(), Mouse.getActualPositionY());
+
+            mouseLocked = true;
+        } else {
+            mouseLocked = false;
+        }
+
+        if (mouseLocked) {
+            float angleChange = Mouse.getDeltaX() * 0.1f;
+
+            System.out.println("Angle around player: " + angleAroundPlayer);
+
+            angleAroundPlayer -= angleChange;
+        }
     }
 }
