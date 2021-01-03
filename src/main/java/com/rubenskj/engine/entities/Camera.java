@@ -29,6 +29,7 @@ public class Camera {
         updateDeltaValues();
         // 19th Episode WATCH
         calculateZoom();
+        calculateAngles();
         calculatePitch();
         calculateAngleAroundPlayer();
 
@@ -91,31 +92,7 @@ public class Camera {
         });
     }
 
-    private void calculatePitch() {
-        long window = WindowManager.getInstance();
-
-        // 19th Episode WATCH
-
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
-            glfwSetCursorPos(window, Mouse.getActualPositionX(), Mouse.getActualPositionY());
-
-            mouseLocked = true;
-        } else {
-            mouseLocked = false;
-        }
-
-        if (mouseLocked) {
-//            if (Mouse.getDeltaY() <= 0 || Mouse.getDeltaY() >= 90) {
-//                return;
-//            }
-
-            float pitchChange = Mouse.getDeltaY() * 0.1f;
-            pitch -= pitchChange;
-        }
-    }
-
-    private void calculateAngleAroundPlayer() {
-        // 19th Episode WATCH
+    private void calculateAngles() {
         long window = WindowManager.getInstance();
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
@@ -127,11 +104,67 @@ public class Camera {
         }
 
         if (mouseLocked) {
+
+            float pitchChange = Mouse.getDeltaY() * 0.1f;
+
+            alterPitch(pitchChange);
+            System.out.println("PITCH: " + pitch);
+
             float angleChange = Mouse.getDeltaX() * 0.1f;
 
-            System.out.println("Angle around player: " + angleAroundPlayer);
-
-            angleAroundPlayer -= angleChange;
+            alterAngleAroundPlayer(angleChange);
         }
+    }
+
+    private void calculatePitch() {
+        long window = WindowManager.getInstance();
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) {
+            glfwSetCursorPos(window, Mouse.getActualPositionX(), Mouse.getActualPositionY());
+
+            mouseLocked = true;
+        } else {
+            mouseLocked = false;
+        }
+
+        if (mouseLocked) {
+
+            float pitchChange = Mouse.getDeltaY() * 0.1f;
+
+            alterPitch(pitchChange);
+        }
+    }
+
+    private void calculateAngleAroundPlayer() {
+        // 19th Episode WATCH
+        long window = WindowManager.getInstance();
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS) {
+            glfwSetCursorPos(window, Mouse.getActualPositionX(), Mouse.getActualPositionY());
+
+            mouseLocked = true;
+        } else {
+            mouseLocked = false;
+        }
+
+        if (mouseLocked) {
+            float angleChange = Mouse.getDeltaX() * 0.1f;
+
+            alterAngleAroundPlayer(angleChange);
+        }
+    }
+
+    private void alterPitch(float pitchChange) {
+        float pitchUpdated = pitch - pitchChange;
+
+        if (pitchUpdated <= 3f || pitchUpdated >= 85) {
+            return;
+        }
+
+        pitch -= pitchChange;
+    }
+
+    private void alterAngleAroundPlayer(float angleChange) {
+        angleAroundPlayer -= angleChange;
     }
 }
