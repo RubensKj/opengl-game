@@ -1,7 +1,9 @@
 package com.rubenskj.engine.io;
 
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -9,8 +11,8 @@ public class WindowManager {
 
     private static long WINDOW;
 
-    public static int WIDHT = 1280;
-    public static int HEIGHT = 720;
+    public static int WIDHT = 800;
+    public static int HEIGHT = 600;
 
     private static final int FPS_CAP = 120;
 
@@ -78,12 +80,28 @@ public class WindowManager {
     public static void updateWindow() {
         glfwPollEvents();
 
+        checkResizeble();
+
         glfwSwapBuffers(getInstance());
 
         long currentTime = getCurrentTime();
 
         delta = (currentTime - lastFrameTime) / 1000f;
         lastFrameTime = getCurrentTime();
+    }
+
+    private static void checkResizeble() {
+        long window = getInstance();
+
+        glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int width, int height) {
+                WIDHT = width;
+                HEIGHT = height;
+            }
+        });
+
+        GL11.glViewport(0, 0, WIDHT, HEIGHT);
     }
 
     public static float getFrameTimeSeconds() {

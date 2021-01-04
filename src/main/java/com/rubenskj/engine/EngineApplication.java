@@ -65,8 +65,8 @@ public class EngineApplication {
 
         // TERRAIN
 
-        Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
-        Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
+        Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
+        Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
 
         // CAMERA AND RENDER
 
@@ -136,11 +136,11 @@ public class EngineApplication {
         for (int i = 0; i < 200; i++) {
             Random random = new Random();
 
-            float x = random.nextFloat() * 100 - 50;
+            float x = random.nextFloat() * 150 - 50;
             float y = 0;
-            float z = random.nextFloat() * 100 - 50;
+            float z = random.nextFloat() * 150 - 50;
 
-            trees.add(new Entity(texturedModel, new Vector3f(x, y, z), 0, 160, 0, 3));
+            trees.add(new Entity(texturedModel, new Vector3f(x, y, z), 0, 0, 0, 3));
         }
 
         return trees;
