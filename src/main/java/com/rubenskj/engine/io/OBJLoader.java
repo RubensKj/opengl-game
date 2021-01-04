@@ -13,6 +13,8 @@ import static com.rubenskj.engine.util.StaticUtil.RES_FOLDER;
 
 public class OBJLoader {
 
+    private static int QUANTITY_FACES = 3;
+
     public static ModelData loadOBJ(String objFileName) {
         FileReader isr = null;
         File objFile = new File(RES_FOLDER + objFileName + ".obj");
@@ -23,18 +25,18 @@ public class OBJLoader {
         }
         BufferedReader reader = new BufferedReader(isr);
         String line;
-        List<Vertex> vertices = new ArrayList<Vertex>();
-        List<Vector2f> textures = new ArrayList<Vector2f>();
-        List<Vector3f> normals = new ArrayList<Vector3f>();
-        List<Integer> indices = new ArrayList<Integer>();
+        List<Vertex> vertices = new ArrayList<>();
+        List<Vector2f> textures = new ArrayList<>();
+        List<Vector3f> normals = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
         try {
             while (true) {
                 line = reader.readLine();
                 if (line.startsWith("v ")) {
                     String[] currentLine = line.split(" ");
-                    Vector3f vertex = new Vector3f((float) Float.valueOf(currentLine[1]),
-                            (float) Float.valueOf(currentLine[2]),
-                            (float) Float.valueOf(currentLine[3]));
+                    Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
+                            Float.valueOf(currentLine[2]),
+                            Float.valueOf(currentLine[3]));
                     Vertex newVertex = new Vertex(vertices.size(), vertex);
                     vertices.add(newVertex);
 
@@ -55,12 +57,19 @@ public class OBJLoader {
             }
             while (line != null && line.startsWith("f ")) {
                 String[] currentLine = line.split(" ");
-                String[] vertex1 = currentLine[1].split("/");
-                String[] vertex2 = currentLine[2].split("/");
-                String[] vertex3 = currentLine[3].split("/");
-                processVertex(vertex1, vertices, indices);
-                processVertex(vertex2, vertices, indices);
-                processVertex(vertex3, vertices, indices);
+
+                for (int i = 0; i < currentLine.length; i++) {
+                    String lineVertex = currentLine[i];
+
+                    if (!lineVertex.contains("/")) {
+                        continue;
+                    }
+
+                    QUANTITY_FACES = currentLine.length - 1;
+                    String[] vertex = lineVertex.split("/");
+
+                    processVertex(vertex, vertices, indices);
+                }
                 line = reader.readLine();
             }
             reader.close();
@@ -68,9 +77,9 @@ public class OBJLoader {
             System.err.println("Error reading the file");
         }
         removeUnusedVertices(vertices);
-        float[] verticesArray = new float[vertices.size() * 3];
+        float[] verticesArray = new float[vertices.size() * QUANTITY_FACES];
         float[] texturesArray = new float[vertices.size() * 2];
-        float[] normalsArray = new float[vertices.size() * 3];
+        float[] normalsArray = new float[vertices.size() * QUANTITY_FACES];
         float furthest = convertDataToArrays(vertices, textures, normals, verticesArray,
                 texturesArray, normalsArray);
         int[] indicesArray = convertIndicesListToArray(indices);
@@ -147,9 +156,9 @@ public class OBJLoader {
         }
     }
 
-    private static void removeUnusedVertices(List<Vertex> vertices){
-        for(Vertex vertex:vertices){
-            if(!vertex.isSet()){
+    private static void removeUnusedVertices(List<Vertex> vertices) {
+        for (Vertex vertex : vertices) {
+            if (!vertex.isSet()) {
                 vertex.setTextureIndex(0);
                 vertex.setNormalIndex(0);
             }

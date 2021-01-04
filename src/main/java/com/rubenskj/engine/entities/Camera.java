@@ -79,15 +79,9 @@ public class Camera {
         GLFW.glfwSetScrollCallback(window, new GLFWScrollCallback() {
             @Override
             public void invoke(long win, double dx, double dy) {
-                if (distanceFromPlayer >= 60) {
-                    distanceFromPlayer = 60;
-                }
-
                 float zoomLevel = (float) (dy * 0.5f);
 
-                if (distanceFromPlayer <= 60) {
-                    distanceFromPlayer -= zoomLevel;
-                }
+                alterDistanceFromPlayer(zoomLevel);
             }
         });
     }
@@ -153,14 +147,24 @@ public class Camera {
         }
     }
 
+    private void alterDistanceFromPlayer(float zoomLevel) {
+        float distanceFromPlayerUpdate = distanceFromPlayer - zoomLevel;
+
+        if (distanceFromPlayerUpdate < 15 || distanceFromPlayerUpdate > 60) {
+            return;
+        }
+
+        distanceFromPlayer -= zoomLevel;
+    }
+
     private void alterPitch(float pitchChange) {
-        float pitchUpdated = pitch - pitchChange;
+        float pitchUpdated = pitch + pitchChange;
 
         if (pitchUpdated <= 3f || pitchUpdated >= 85) {
             return;
         }
 
-        pitch -= pitchChange;
+        pitch += pitchChange;
     }
 
     private void alterAngleAroundPlayer(float angleChange) {

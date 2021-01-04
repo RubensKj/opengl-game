@@ -56,6 +56,8 @@ public class EngineApplication {
 
         entities.addAll(createGrass(loader));
         entities.addAll(createTrees(loader));
+        entities.add(createEntity("dragon", "white", new Vector3f(100, 0, -25), 1, loader));
+        entities.add(createEntity("spaceship", "white", new Vector3f(110, 8, -35), 1, loader));
 
         // LIGHT
 
