@@ -75,7 +75,7 @@ public class EngineApplication {
 
         TexturedModel texturedPlayer = createTexturedModel("person", "playerTexture", loader);
 
-        Player player = new Player(texturedPlayer, new Vector3f(100, 0, -50), 0, 180, 0, 0.6f);
+        Player player = new Player(texturedPlayer, new Vector3f(100, 0, -50), 0, 0, 0, 0.6f);
         Camera camera = new Camera(player);
 
         while (!glfwWindowShouldClose(window)) {
