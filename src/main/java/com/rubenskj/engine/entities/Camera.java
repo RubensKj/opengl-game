@@ -27,7 +27,7 @@ public class Camera {
 
     public void move() {
         updateDeltaValues();
-        // 19th Episode WATCH
+        checkInputs();
         calculateZoom();
         calculateAngles();
         calculatePitch();
@@ -38,6 +38,14 @@ public class Camera {
 
         calculateCameraPosition(horizontalDistance, verticalDistance);
         this.yaw = 180 - (player.getRotY() + angleAroundPlayer);
+    }
+
+    private void checkInputs() {
+        long window = WindowManager.getInstance();
+
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_TRUE) {
+            this.angleAroundPlayer = 0;
+        }
     }
 
     public Vector3f getPosition() {

@@ -11,8 +11,8 @@ public class WindowManager {
 
     private static long WINDOW;
 
-    public static int WIDHT = 800;
-    public static int HEIGHT = 600;
+    public static int WIDHT = 1280;
+    public static int HEIGHT = 720;
 
     private static final int FPS_CAP = 120;
 

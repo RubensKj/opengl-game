@@ -13,6 +13,7 @@ import com.rubenskj.engine.textures.TerrainTexturePack;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -37,6 +38,13 @@ public class EngineApplication {
 
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
 
+        // TERRAIN
+
+        Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
+        Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
+
+        List<Terrain> terrains = Arrays.asList(terrain, terrain2);
+
         // ENTITIES
 
         Entity tree = createEntity("tree", "tree", new Vector3f(0, 0, 0), 1, loader);
@@ -52,21 +60,14 @@ public class EngineApplication {
 
         List<Entity> entities = new ArrayList<>();
 
-        Random random = new Random(676452);
-
-        entities.addAll(createGrass(loader));
-        entities.addAll(createTrees(loader));
+        entities.addAll(createGrass(loader, terrains));
+        entities.addAll(createTrees(loader, terrains));
         entities.add(createEntity("dragon", "white", new Vector3f(100, 0, -25), 1, loader));
         entities.add(createEntity("spaceship", "white", new Vector3f(110, 8, -35), 1, loader));
 
         // LIGHT
 
         Light light = new Light(new Vector3f(20000, 40000, 20000), new Vector3f(1, 1, 1));
-
-        // TERRAIN
-
-        Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
-        Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
 
         // CAMERA AND RENDER
 
@@ -79,8 +80,9 @@ public class EngineApplication {
         Camera camera = new Camera(player);
 
         while (!glfwWindowShouldClose(window)) {
+            Terrain terrainCurrent = Terrain.whichTerrainObjectIs(player.getPosition(), new ArrayList<>(terrains));
+            player.move(terrainCurrent);
             camera.move();
-            player.move();
 
             renderer.processEntity(player);
             renderer.processTerrain(terrain);
@@ -125,7 +127,7 @@ public class EngineApplication {
         return new Entity(texturedModel, new Vector3f(15, 0, 25), 0, 160, 0, 1);
     }
 
-    private static List<Entity> createTrees(Loader loader) {
+    private static List<Entity> createTrees(Loader loader, List<Terrain> terrains) {
         ModelData data = OBJLoader.loadOBJ("tree");
         RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
         ModelTexture texture = new ModelTexture(loader.loadTexture("tree"));
@@ -137,8 +139,15 @@ public class EngineApplication {
             Random random = new Random();
 
             float x = random.nextFloat() * 150 - 50;
-            float y = 0;
-            float z = random.nextFloat() * 150 - 50;
+            float z = random.nextFloat() * -750 + 50;
+            float y;
+            Terrain terrain = Terrain.whichTerrainObjectIs(new Vector3f(x, 0, z), terrains);
+
+            if (terrain != null) {
+                y = terrain.getHeightOfTerrain(x, z);
+            } else {
+                y = 0;
+            }
 
             trees.add(new Entity(texturedModel, new Vector3f(x, y, z), 0, 0, 0, 3));
         }
@@ -146,11 +155,11 @@ public class EngineApplication {
         return trees;
     }
 
-    private static List<Entity> createGrass(Loader loader) {
+    private static List<Entity> createGrass(Loader loader, List<Terrain> terrains) {
 
-        Entity grass = createEntity("grassModel", "grassTexture", new Vector3f(0, 0, 0), 0.4f, loader);
+        Entity grass = createEntity("grassModel", "grassTexture", new Vector3f(0, 0, 0), 1f, loader);
         Entity fern = createEntity("fern", "fern", new Vector3f(0, 0, 0), 0.6f, loader);
-        Entity flower = createEntity("grassModel", "flower", new Vector3f(0, 0, 0), 0.4f, loader);
+        Entity flower = createEntity("grassModel", "flower", new Vector3f(0, 0, 0), 1f, loader);
 
         grass.getModel().getTexture().setHasTransparency(true);
         grass.getModel().getTexture().setUseFakeLighting(true);
@@ -164,9 +173,17 @@ public class EngineApplication {
         for (int i = 0; i < 200; i++) {
             Random random = new Random();
 
-            float x = random.nextFloat() * 108 - 50;
-            float y = 0;
-            float z = random.nextFloat() * 105 - 50;
+            float x = random.nextFloat() * 150 - 50;
+            float z = random.nextFloat() * -750 + 50;
+            float y;
+
+            Terrain terrain = Terrain.whichTerrainObjectIs(new Vector3f(x, 0, z), terrains);
+
+            if (terrain != null) {
+                y = terrain.getHeightOfTerrain(x, z);
+            } else {
+                y = 0;
+            }
 
             if (i > 88) {
                 fern.setPosition(new Vector3f(x, y, z));
